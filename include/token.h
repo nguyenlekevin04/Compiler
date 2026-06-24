@@ -3,6 +3,9 @@
 
 #define COUNT 27
 
+/**
+ * @brief Represents the different types of tokens in the language.
+ */
 typedef enum{
     TOKEN_EOF,
     TOKEN_ILLEGAL,
@@ -33,15 +36,36 @@ typedef enum{
     TOKEN_FALSE,
 }Tokentype;
 
-
+/**
+ * @brief Represents a token with its type and lexeme.
+ */
 typedef struct {
     Tokentype Type;
     char* Lexeme;
 }Token;
 
+/**
+ * @brief An array of string representations for each token type.
+ */
 extern const char* tokens[];
+/**
+ * @brief Creates a new token with the specified type and lexeme.
+ * @param tokentype The type of the token.
+ * @param ch The character representing the token.
+ * @return A new token instance.
+ */
 Token createToken(Tokentype tokentype, char ch);
+/**
+ * @brief Creates a new token with the specified type and lexeme.
+ * @param tokentype The type of the token.
+ * @param lexeme The string representing the token.
+ * @return A new token instance.
+ */
 Token createDoubleCharToken(Tokentype tokentype, char ch1, char ch2);
+/**
+ * @brief Frees the memory allocated for a token.
+ * @param t Pointer to the token to be freed.
+ */
 void FreeToken(Token* t);
 
 #endif
