@@ -41,5 +41,10 @@ void FreeLexer(Lexer* l);
  * @return The next character.
  */
 char peekChar(Lexer* l);
-
+/**
+ * @brief Peeks at the next token in the input string without consuming it.
+ * @param l Pointer to the lexer.
+ * @return The next token.
+ */
+Token peekToken(Lexer* l);
 #endif
