@@ -11,7 +11,7 @@ Token getNextToken(Lexer* l) {
 
 Ast* parseFactor(Lexer* l) {
     Token t1 = getNextToken(l);
-
+    
     if (t1.Type == TOKEN_DIGIT) {
         Ast* node = (Ast*)malloc(sizeof(Ast));
         node->AstType = DIGIT;
@@ -99,20 +99,5 @@ void printAst(Ast* node) {
     }
 
     printAst(node->right);
-}
 
-int main() {
-    char input[256];
-    printf("Enter an expression: ");
-    fgets(input, sizeof(input), stdin);
-
-    Lexer* lexer = New(input);
-    Ast* ast = parseExpression(lexer);
-
-    printf("Parsed AST (in-order traversal): ");
-    printAst(ast);
-    printf("\n");
-
-    FreeLexer(lexer);
-    return 0;
 }
