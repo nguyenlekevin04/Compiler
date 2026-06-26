@@ -1,3 +1,6 @@
+#ifndef PARSER_H
+#define PARSER_H
+
 #include "token.h"
 #include "lexer.h"
 
@@ -40,3 +43,5 @@ Ast* parseExpression(Lexer* l);
  * @param node Pointer to the AST node to print.
  */
 void printAst(Ast* node);
+
+#endif
