@@ -11,7 +11,7 @@ Token getNextToken(Lexer* l) {
 
 Ast* parseFactor(Lexer* l) {
     Token t1 = getNextToken(l);
-    
+
     if (t1.Type == TOKEN_DIGIT) {
         Ast* node = (Ast*)malloc(sizeof(Ast));
         node->AstType = DIGIT;
