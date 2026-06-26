@@ -1,5 +1,5 @@
-#ifndef TOKENHEADER_H
-#define TOKENHEADER_H
+#ifndef TOKEN_H
+#define TOKEN_H
 
 #define COUNT 27
 
