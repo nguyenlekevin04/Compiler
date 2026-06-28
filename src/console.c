@@ -17,7 +17,7 @@ void go(){
         Lexer* l = New(string);
         printf("%s",string);
 
-        Ast* ast = parseExpression(l);
+        Ast* ast = parseStatement   (l);
         printf("AST: ");
         printAst(ast);
 

@@ -8,8 +8,9 @@
  * @brief Represents an abstract syntax tree (AST) node.
  */
 typedef struct Ast {
-    enum {MULT, PLUS, MINUS, DIVIDE, DIGIT, INVALID} AstType;
+    enum {MULT, PLUS, MINUS, DIVIDE, DIGIT, VAR, ASSIGN, INVALID} AstType;
     int value;
+    char* name;
     struct Ast* right;
     struct Ast* left;
 } Ast;
@@ -26,6 +27,12 @@ Token getNextToken(Lexer* l);
  * @return A pointer to the parsed AST node.
  */
 Ast* parseFactor(Lexer* l);
+/**
+ * @brief Parses a statement from the lexer.
+ * @param l Pointer to the lexer.
+ * @return A pointer to the parsed AST node.
+ */
+Ast* parseStatement(Lexer* l);
 /**
  * @brief Parses a term from the lexer.
  * @param l Pointer to the lexer.
