@@ -2,11 +2,23 @@
 #include <stdlib.h>
 
 #include "../include/interpreter.h"
+#include "../include/symboltable.h"
 
 int evaluate(Ast* node) {
     int result = 0;
 
     switch (node->AstType) {
+        case ASSIGN:
+            result = evaluate(node->left);
+            set(node->name, result);
+            break;
+        case VAR:
+            result = get(node->name);
+            if (result == -1) {
+                printf("Error: Variable '%s' not found\n", node->name);
+                exit(1);
+            }
+            break;
         case DIGIT:
             return node->value;
         case PLUS:
