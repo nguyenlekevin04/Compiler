@@ -27,12 +27,6 @@ typedef struct Ast {
  */
 Ast* parseFactor(Lexer* l);
 /**
- * @brief Parses a statement from the lexer.
- * @param l Pointer to the lexer.
- * @return A pointer to the parsed AST node.
- */
-Ast* parseStatement(Lexer* l);
-/**
  * @brief Parses a term from the lexer.
  * @param l Pointer to the lexer.
  * @return A pointer to the parsed AST node.
@@ -44,6 +38,12 @@ Ast* parseTerm(Lexer* l);
  * @return A pointer to the parsed AST node.
  */
 Ast* parseExpression(Lexer* l);
+/**
+ * @brief Parses a comparison from the lexer.
+ * @param l Pointer to the lexer.
+ * @return A pointer to the parsed AST node.
+ */
+Ast* parseComparison(Lexer* l);
 /**
  * @brief Parses a block of statements from the lexer.
  * @param l Pointer to the lexer.
@@ -62,6 +62,19 @@ Ast* parseIf(Lexer* l);
  * @return A pointer to the parsed AST node.
  */
 Ast* parseWhile(Lexer* l);
+/**
+ * @brief Parses an assignment statement from the lexer.
+ * @param l Pointer to the lexer.
+ * @param t1 The token representing the variable being assigned to.
+ * @return A pointer to the parsed AST node.
+ */
+Ast* parseAssign(Lexer* l, Token t1);
+/**
+ * @brief Parses a statement from the lexer.
+ * @param l Pointer to the lexer.
+ * @return A pointer to the parsed AST node.
+ */
+Ast* parseStatement(Lexer* l);
 /**
  * @brief Prints the abstract syntax tree.
  * @param node Pointer to the AST node to print.
