@@ -6,4 +6,10 @@
  */
 void go();
 
+/**
+ * @brief Tests the lexer with the given input.
+ * @param input The input string to tokenize.
+ */
+void lexerTest(char* input);
+
 #endif

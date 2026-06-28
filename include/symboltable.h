@@ -26,4 +26,5 @@ void set(char* name, int value);
  * @return The value of the variable, or -1 if not found.
  */
 int get(char* name);
+
 #endif
