@@ -8,13 +8,14 @@
  * @brief Represents an abstract syntax tree (AST) node.
  */
 typedef struct Ast {
-    enum {DIGIT, BINOP, ASSIGN, IF, VAR, INVALID} AstType;
+    enum {DIGIT, BINOP, ASSIGN, IF, WHILE, VAR, INVALID} AstType;
     union {
         struct {int value;} digit;
         struct {struct Ast* left; struct Ast* right; enum {PLUS, MINUS, MULT, DIVIDE, EQ, NE, LT, GT, LE, GE, PLUSEQ, MINUSEQ, MULTEQ, DIVEQ} op;} binop;
         struct {char* name; struct Ast* left;} assign;
         struct {char* name;} var;
         struct {struct Ast* condition; struct Ast* thenBranch; struct Ast* elseBranch;} ifStmt;
+        struct {struct Ast* condition; struct Ast* body;} whileStmt;
     }data;
     struct Ast* next;
 } Ast;
@@ -55,6 +56,12 @@ Ast* parseBlock(Lexer* l);
  * @return A pointer to the parsed AST node.
  */
 Ast* parseIf(Lexer* l);
+/**
+ * @brief Parses a while statement from the lexer.
+ * @param l Pointer to the lexer.
+ * @return A pointer to the parsed AST node.
+ */
+Ast* parseWhile(Lexer* l);
 /**
  * @brief Prints the abstract syntax tree.
  * @param node Pointer to the AST node to print.

@@ -8,6 +8,7 @@
         [TOKEN_LET]       = "let",
         [TOKEN_IF]        = "if",
         [TOKEN_ELSE]      = "else",
+        [TOKEN_WHILE]     = "while",
         [TOKEN_RETURN]    = "return",
         [TOKEN_TRUE]      = "true",
         [TOKEN_FALSE]     = "false"

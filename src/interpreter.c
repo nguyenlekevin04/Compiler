@@ -84,6 +84,11 @@ int evaluate(Ast* node) {
                 result = evaluate(node->data.ifStmt.elseBranch);
             }
             break;
+        case WHILE:
+            while (evaluate(node->data.whileStmt.condition)) {
+                result = evaluate(node->data.whileStmt.body);
+            }
+            break;
         default:
             printf("Error: Invalid AST node type\n");
             exit(1);

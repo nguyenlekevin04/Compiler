@@ -115,12 +115,14 @@ Ast* parseStatement(Lexer* l) {
             node->data.binop.left->data.var.name = t1.Lexeme;
             node->data.binop.right = parseComparison(l);
             return node;
-        } else {
+        }else {
             printf("Error: Unexpected token after identifier: %s\n", t2.Lexeme);
             return NULL;
         }
     } else if (t1.Type == TOKEN_IF) {
         return parseIf(l);
+    } else if (t1.Type == TOKEN_WHILE) {
+        return parseWhile(l);
     } else {
         Ast* node = parseComparison(l);
         return node;
@@ -239,6 +241,36 @@ Ast* parseIf(Lexer* l) {
     return ifNode;
 }
 
+Ast* parseWhile(Lexer* l) {
+        Token t1 = GetToken(l);
+    if (t1.Type != TOKEN_WHILE) {
+        printf("Error: Expected 'while' keyword, but got %s\n", t1.Lexeme);
+        return NULL;
+    }
+
+    Token t2 = GetToken(l);
+    if (t2.Type != TOKEN_LPAREN) {
+        printf("Error: Expected '(' after 'while', but got %s\n", t2.Lexeme);
+        return NULL;
+    }
+
+    Ast* condition = parseComparison(l);
+    Token t3 = GetToken(l); 
+    if (t3.Type != TOKEN_RPAREN) {
+        printf("Error: Expected ')' after condition, but got %s\n", t3.Lexeme);
+        return NULL;
+    }
+
+    Ast* thenBranch = parseBlock(l);
+
+    Ast* whileNode = (Ast*)malloc(sizeof(Ast));
+    whileNode->AstType = WHILE;
+    whileNode->data.whileStmt.condition = condition;
+    whileNode->data.whileStmt.body = thenBranch;
+
+    return whileNode;
+}
+
 void printAst(Ast* node) {
     if (node == NULL) {
         return;
@@ -319,6 +351,13 @@ void printAst(Ast* node) {
                 printAst(node->data.ifStmt.elseBranch);
                 printf("} ");
             }
+            break;
+        case WHILE:
+            printf("while (");
+            printAst(node->data.whileStmt.condition);
+            printf(") { ");
+            printAst(node->data.whileStmt.body);
+            printf("} ");
             break;
         default:
             printf("Invalid AST node type\n");
