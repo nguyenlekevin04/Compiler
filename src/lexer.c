@@ -186,6 +186,21 @@ Token peekToken(Lexer* l) {
     return tok;
 }
 
+Token peekNextToken(Lexer* l) {
+    int currentPosition = l->position;
+    int currentReadPosition = l->readPosition;
+    char currentChar = l->ch;
+
+    GetToken(l);
+    Token tok = GetToken(l);
+
+    l->position = currentPosition;
+    l->readPosition = currentReadPosition;
+    l->ch = currentChar;
+
+    return tok;
+}
+
 void FreeLexer(Lexer* l){
     if (l) {
         free(l->input);

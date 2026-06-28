@@ -47,4 +47,10 @@ char peekChar(Lexer* l);
  * @return The next token.
  */
 Token peekToken(Lexer* l);
+/**
+ * @brief Peeks at the token after the next token in the input string without consuming it.
+ * @param l Pointer to the lexer.
+ * @return The token after the next token.
+ */
+Token peekNextToken(Lexer* l);
 #endif
