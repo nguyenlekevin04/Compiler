@@ -8,11 +8,14 @@
  * @brief Represents an abstract syntax tree (AST) node.
  */
 typedef struct Ast {
-    enum {MULT, PLUS, MINUS, DIVIDE, DIGIT, VAR, ASSIGN, INVALID} AstType;
-    int value;
-    char* name;
-    struct Ast* right;
-    struct Ast* left;
+    enum {DIGIT, BINOP, ASSIGN, IF, VAR, INVALID} AstType;
+    union {
+        struct {int value;} digit;
+        struct {struct Ast* left; struct Ast* right; enum {PLUS, MINUS, MULT, DIVIDE} op;} binop;
+        struct {char* name; struct Ast* left;} assign;
+        struct {char* name;} var;
+        struct {struct Ast* condition; struct Ast* thenBranch; struct Ast* elseBranch;} ifStmt;
+    }data;
 } Ast;
 
 /**

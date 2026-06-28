@@ -15,16 +15,12 @@ Ast* parseFactor(Lexer* l) {
     if (t1.Type == TOKEN_DIGIT) {
         Ast* node = (Ast*)malloc(sizeof(Ast));
         node->AstType = DIGIT;
-        node->value = atoi(t1.Lexeme);
-        node->left = NULL;
-        node->right = NULL;
+        node->data.digit.value = atoi(t1.Lexeme);
         return node;
     } else if (t1.Type == TOKEN_ID) {
         Ast* node = (Ast*)malloc(sizeof(Ast));
         node->AstType = VAR;
-        node->name = t1.Lexeme;
-        node->left = NULL;
-        node->right = NULL;
+        node->data.var.name = t1.Lexeme;
         return node;
     } else {
         printf("Error: Expected a digit or identifier, but got %s\n", t1.Lexeme);
@@ -41,9 +37,8 @@ Ast* parseStatement(Lexer* l) {
             GetToken(l);
             Ast* node = (Ast*)malloc(sizeof(Ast));
             node->AstType = ASSIGN;
-            node->name = t1.Lexeme;
-            node->left = parseExpression(l);
-            node->right = NULL;
+            node->data.assign.name = t1.Lexeme;
+            node->data.assign.left = parseExpression(l);
             return node;
         } else if (t2.Type == TOKEN_PLUS || t2.Type == TOKEN_MINUS || t2.Type == TOKEN_MULT || t2.Type == TOKEN_DIV) {
             Ast* node = parseExpression(l);
@@ -67,16 +62,18 @@ Ast* parseTerm(Lexer* l) {
     if (t1.Type == TOKEN_MULT) {
         GetToken(l);
         Ast* node = (Ast*)malloc(sizeof(Ast));
-        node->AstType = MULT;
-        node->left = left;
-        node->right = parseTerm(l);
+        node->AstType = BINOP;
+        node->data.binop.left = left;
+        node->data.binop.right = parseTerm(l);
+        node->data.binop.op = MULT;
         return node;
     } else if (t1.Type == TOKEN_DIV) {
         GetToken(l);
         Ast *node = (Ast*)malloc(sizeof(Ast));
-        node->AstType = DIVIDE;
-        node->left = left;
-        node->right = parseTerm(l);
+        node->AstType = BINOP;
+        node->data.binop.left = left;
+        node->data.binop.right = parseTerm(l);
+        node->data.binop.op = DIVIDE;
         return node;
     } else {
         return left;
@@ -90,16 +87,18 @@ Ast* parseExpression(Lexer* l) {
     if (t1.Type == TOKEN_PLUS) {
         GetToken(l);
         Ast* node = (Ast*)malloc(sizeof(Ast));
-        node->AstType = PLUS;
-        node->left = left;
-        node->right = parseExpression(l);
+        node->AstType = BINOP;
+        node->data.binop.op = PLUS;
+        node->data.binop.left = left;
+        node->data.binop.right = parseExpression(l);
         return node;
     } else if (t1.Type == TOKEN_MINUS) {
         GetToken(l);
         Ast* node = (Ast*)malloc(sizeof(Ast));
-        node->AstType = MINUS;
-        node->left = left;
-        node->right = parseExpression(l);
+        node->AstType = BINOP;
+        node->data.binop.op = MINUS;
+        node->data.binop.left = left;
+        node->data.binop.right = parseExpression(l);
         return node;
     } else {
         return left;
@@ -111,40 +110,44 @@ void printAst(Ast* node) {
         return;
     }
     if (node->AstType == ASSIGN) {
-        printf("%s = ", node->name);
-        printAst(node->left);
+        printf("%s = ", node->data.assign.name);
+        printAst(node->data.assign.left);
         return;
     }   
 
-    printAst(node->left);
-
     switch (node->AstType) {
         case DIGIT:
-            printf("%d ", node->value);
+            printf("%d ", node->data.digit.value);
             break;
-        case PLUS:
-            printf("+ ");
-            break;
-        case MINUS:
-            printf("- ");
-            break;
-        case MULT:
-            printf("* ");
-            break;
-        case DIVIDE:
-            printf("/ ");
+        case BINOP:
+            printAst(node->data.binop.left);
+
+            switch (node->data.binop.op) {
+                case PLUS:
+                    printf("+ ");
+                    break;
+                case MINUS:
+                    printf("- ");
+                    break;
+                case MULT:
+                    printf("* ");
+                    break;
+                case DIVIDE:
+                    printf("/ ");
+                    break;
+            }
             break;
         case VAR:
-            printf("%s ", node->name);
+            printf("%s ", node->data.var.name);
             break;
         case ASSIGN:
-            printf("%s = ", node->name);
+            printf("%s = ", node->data.assign.name);
             break;
         default:
             printf("Invalid AST node type\n");
     }
 
-    if (node->right != NULL) {
-        printAst(node->right);
+    if (node->data.binop.right != NULL) {
+        printAst(node->data.binop.right);
     }
 }

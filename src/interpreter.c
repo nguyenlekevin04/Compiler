@@ -9,29 +9,33 @@ int evaluate(Ast* node) {
 
     switch (node->AstType) {
         case ASSIGN:
-            result = evaluate(node->left);
-            set(node->name, result);
+            result = evaluate(node->data.assign.left);
+            set(node->data.assign.name, result);
             break;
         case VAR:
-            result = get(node->name);
+            result = get(node->data.var.name);
             if (result == -1) {
-                printf("Error: Variable '%s' not found\n", node->name);
+                printf("Error: Variable '%s' not found\n", node->data.var.name);
                 exit(1);
             }
             break;
         case DIGIT:
-            return node->value;
-        case PLUS:
-            result = evaluate(node->left) + evaluate(node->right);
-            break;
-        case MINUS:
-            result = evaluate(node->left) - evaluate(node->right);
-            break;
-        case MULT:
-            result = evaluate(node->left) * evaluate(node->right);
-            break;
-        case DIVIDE:
-            result = evaluate(node->left) / evaluate(node->right);
+            return node->data.digit.value;
+        case BINOP:
+            switch (node->data.binop.op) {
+                case PLUS:
+                    result = evaluate(node->data.binop.left) + evaluate(node->data.binop.right);
+                    break;
+                case MINUS:
+                    result = evaluate(node->data.binop.left) - evaluate(node->data.binop.right);
+                    break;
+                case MULT:
+                    result = evaluate(node->data.binop.left) * evaluate(node->data.binop.right);
+                    break;
+                case DIVIDE:
+                    result = evaluate(node->data.binop.left) / evaluate(node->data.binop.right);
+                    break;
+            }
             break;
         default:
             printf("Error: Invalid AST node type\n");
