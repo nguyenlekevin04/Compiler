@@ -11,7 +11,7 @@ typedef struct Ast {
     enum {DIGIT, BINOP, ASSIGN, IF, VAR, INVALID} AstType;
     union {
         struct {int value;} digit;
-        struct {struct Ast* left; struct Ast* right; enum {PLUS, MINUS, MULT, DIVIDE} op;} binop;
+        struct {struct Ast* left; struct Ast* right; enum {PLUS, MINUS, MULT, DIVIDE, EQ, NE, LT, GT, LE, GE, PLUSEQ, MINUSEQ, MULTEQ, DIVEQ} op;} binop;
         struct {char* name; struct Ast* left;} assign;
         struct {char* name;} var;
         struct {struct Ast* condition; struct Ast* thenBranch; struct Ast* elseBranch;} ifStmt;

@@ -106,7 +106,16 @@ Token GetToken(Lexer* l){
                 break;
             }
         case '+':
-            tok = createToken(TOKEN_PLUS, l->ch);
+            if(peekChar(l) == '=') {
+                char ch = l->ch;
+
+                readChar(l);
+                tok = createDoubleCharToken(TOKEN_PLUSEQ, ch, l->ch);
+                break;
+            } else {
+                tok = createToken(TOKEN_PLUS, l->ch);
+                break;
+            }
             break;
         case ';':
             tok = createToken(TOKEN_SEMICOLON, l->ch);
@@ -115,20 +124,60 @@ Token GetToken(Lexer* l){
             tok = createToken(TOKEN_COMMA, l->ch);
             break;
         case '-':
-            tok = createToken(TOKEN_MINUS, l->ch);
-            break;
+            if(peekChar(l) == '=') {
+                char ch = l->ch;
+
+                readChar(l);
+                tok = createDoubleCharToken(TOKEN_MINUSEQ, ch, l->ch);
+                break;
+            } else {
+                tok = createToken(TOKEN_MINUS, l->ch);
+                break;
+            }
         case '*':
-            tok = createToken(TOKEN_MULT, l->ch);
-            break;
+            if(peekChar(l) == '=') {
+                char ch = l->ch;
+
+                readChar(l);
+                tok = createDoubleCharToken(TOKEN_MULTEQ, ch, l->ch);
+                break;
+            } else {
+                tok = createToken(TOKEN_MULT, l->ch);
+                break;
+            }
         case '/':
-            tok = createToken(TOKEN_DIV, l->ch);
-            break;
+            if(peekChar(l) == '=') {
+                char ch = l->ch;
+
+                readChar(l);
+                tok = createDoubleCharToken(TOKEN_DIVEQ, ch, l->ch);
+                break;
+            } else {
+                tok = createToken(TOKEN_DIV, l->ch);
+                break;
+            }
         case '<': 
-            tok = createToken(TOKEN_LT, l->ch);
-            break;
+            if(peekChar(l) == '=') {
+                char ch = l->ch;
+
+                readChar(l);
+                tok = createDoubleCharToken(TOKEN_LE, ch, l->ch);
+                break;
+            } else {
+                tok = createToken(TOKEN_LT, l->ch);
+                break;
+            }
         case '>': 
-            tok = createToken(TOKEN_GT, l->ch);
-            break;
+            if(peekChar(l) == '=') {
+                char ch = l->ch;
+
+                readChar(l);
+                tok = createDoubleCharToken(TOKEN_GE, ch, l->ch);
+                break;
+            } else {
+                tok = createToken(TOKEN_GT, l->ch);
+                break;
+            }
         case '!':
             if(peekChar(l) == '=') {
                 char ch = l->ch;

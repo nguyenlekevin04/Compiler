@@ -24,6 +24,63 @@ Ast* parseFactor(Lexer* l) {
     }
 }
 
+Ast* parseComparison(Lexer* l) {
+    Ast* left = parseExpression(l);
+
+    Token t1 = peekToken(l);
+    if (t1.Type == TOKEN_EQ) {
+        GetToken(l);
+        Ast* node = (Ast*)malloc(sizeof(Ast));
+        node->AstType = BINOP;
+        node->data.binop.op = EQ;
+        node->data.binop.left = left;
+        node->data.binop.right = parseExpression(l);
+        return node;
+    } else if(t1.Type == TOKEN_NEQ) {
+        GetToken(l);
+        Ast* node = (Ast*)malloc(sizeof(Ast));
+        node->AstType = BINOP;
+        node->data.binop.op = NE;
+        node->data.binop.left = left;
+        node->data.binop.right = parseExpression(l);
+        return node;
+    } else if(t1.Type == TOKEN_LT) {
+        GetToken(l);
+        Ast* node = (Ast*)malloc(sizeof(Ast));
+        node->AstType = BINOP;
+        node->data.binop.op = LT;
+        node->data.binop.left = left;
+        node->data.binop.right = parseExpression(l);
+        return node;
+    } else if(t1.Type == TOKEN_GT) {
+        GetToken(l);
+        Ast* node = (Ast*)malloc(sizeof(Ast));
+        node->AstType = BINOP;
+        node->data.binop.op = GT;
+        node->data.binop.left = left;
+        node->data.binop.right = parseExpression(l);
+        return node;
+    } else if(t1.Type == TOKEN_LE) {
+        GetToken(l);
+        Ast* node = (Ast*)malloc(sizeof(Ast));
+        node->AstType = BINOP;
+        node->data.binop.op = LE;
+        node->data.binop.left = left;
+        node->data.binop.right = parseExpression(l);
+        return node;
+    } else if(t1.Type == TOKEN_GE) {
+        GetToken(l);
+        Ast* node = (Ast*)malloc(sizeof(Ast));
+        node->AstType = BINOP;
+        node->data.binop.op = GE;
+        node->data.binop.left = left;
+        node->data.binop.right = parseExpression(l);
+        return node;
+    } else {
+        return left;
+    }
+}
+
 Ast* parseStatement(Lexer* l) {
     Token t1 = peekToken(l);
     if (t1.Type == TOKEN_ID) {
@@ -34,10 +91,29 @@ Ast* parseStatement(Lexer* l) {
             Ast* node = (Ast*)malloc(sizeof(Ast));
             node->AstType = ASSIGN;
             node->data.assign.name = t1.Lexeme;
-            node->data.assign.left = parseExpression(l);
+            node->data.assign.left = parseComparison(l);
             return node;
         } else if (t2.Type == TOKEN_PLUS || t2.Type == TOKEN_MINUS || t2.Type == TOKEN_MULT || t2.Type == TOKEN_DIV) {
-            Ast* node = parseExpression(l);
+            Ast* node = parseComparison(l);
+            return node;
+        } else if(t2.Type == TOKEN_PLUSEQ || t2.Type == TOKEN_MINUSEQ || t2.Type == TOKEN_MULTEQ || t2.Type == TOKEN_DIVEQ) {
+            GetToken(l);
+            GetToken(l);
+            Ast* node = (Ast*)malloc(sizeof(Ast));
+            node->AstType = BINOP;
+            if (t2.Type == TOKEN_PLUSEQ) {
+                node->data.binop.op = PLUSEQ;
+            } else if (t2.Type == TOKEN_MINUSEQ) {
+                node->data.binop.op = MINUSEQ;
+            } else if (t2.Type == TOKEN_MULTEQ) {
+                node->data.binop.op = MULTEQ;
+            } else if (t2.Type == TOKEN_DIVEQ) {
+                node->data.binop.op = DIVEQ;
+            }
+            node->data.binop.left = (Ast*)malloc(sizeof(Ast));
+            node->data.binop.left->AstType = VAR;
+            node->data.binop.left->data.var.name = t1.Lexeme;
+            node->data.binop.right = parseComparison(l);
             return node;
         } else {
             printf("Error: Unexpected token after identifier: %s\n", t2.Lexeme);
@@ -46,7 +122,7 @@ Ast* parseStatement(Lexer* l) {
     } else if (t1.Type == TOKEN_IF) {
         return parseIf(l);
     } else {
-        Ast* node = parseExpression(l);
+        Ast* node = parseComparison(l);
         return node;
     }
     printf("Error: Invalid statement\n");
@@ -128,32 +204,27 @@ Ast* parseBlock(Lexer* l) {
 
 Ast* parseIf(Lexer* l) {
     Token t1 = GetToken(l);
-
     if (t1.Type != TOKEN_IF) {
         printf("Error: Expected 'if' keyword, but got %s\n", t1.Lexeme);
         return NULL;
     }
 
     Token t2 = GetToken(l);
-
     if (t2.Type != TOKEN_LPAREN) {
         printf("Error: Expected '(' after 'if', but got %s\n", t2.Lexeme);
         return NULL;
     }
 
-    Ast* condition = parseExpression(l);
+    Ast* condition = parseComparison(l);
     Token t3 = GetToken(l); 
-
     if (t3.Type != TOKEN_RPAREN) {
         printf("Error: Expected ')' after condition, but got %s\n", t3.Lexeme);
         return NULL;
     }
 
     Ast* thenBranch = parseBlock(l);
-
     Ast* elseBranch = NULL;
     Token t4 = peekToken(l);
-
     if (t4.Type == TOKEN_ELSE) {
         GetToken(l);
         elseBranch = parseBlock(l);
@@ -197,7 +268,38 @@ void printAst(Ast* node) {
                 case DIVIDE:
                     printf("/ ");
                     break;
+                case EQ:
+                    printf("== ");
+                    break;
+                case NE:
+                    printf("!= ");
+                    break;
+                case LT:
+                    printf("< ");
+                    break;
+                case GT:
+                    printf("> ");   
+                    break;
+                case LE:
+                    printf("<= ");
+                    break;
+                case GE:
+                    printf(">= ");
+                    break;
+                case PLUSEQ:
+                    printf("+= ");
+                    break;
+                case MINUSEQ:
+                    printf("-= ");
+                    break;
+                case MULTEQ:
+                    printf("*= ");
+                    break;
+                case DIVEQ:
+                    printf("/= ");
+                    break;
             }
+            printAst(node->data.binop.right);
             break;
         case VAR:
             printf("%s ", node->data.var.name);

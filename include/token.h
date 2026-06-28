@@ -1,7 +1,7 @@
 #ifndef TOKEN_H
 #define TOKEN_H
 
-#define COUNT 27
+#define COUNT 35
 
 /**
  * @brief Represents the different types of tokens in the language.
@@ -18,8 +18,14 @@ typedef enum{
     TOKEN_MINUS,
     TOKEN_MULT,
     TOKEN_DIV,
+    TOKEN_PLUSEQ,
+    TOKEN_MINUSEQ,
+    TOKEN_MULTEQ,
+    TOKEN_DIVEQ,
     TOKEN_LT,
     TOKEN_GT,
+    TOKEN_LE,
+    TOKEN_GE,
     TOKEN_COMMA,
     TOKEN_EXCLAM,
     TOKEN_SEMICOLON,

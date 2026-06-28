@@ -35,6 +35,43 @@ int evaluate(Ast* node) {
                 case DIVIDE:
                     result = evaluate(node->data.binop.left) / evaluate(node->data.binop.right);
                     break;
+                case EQ:
+                    result = evaluate(node->data.binop.left) == evaluate(node->data.binop.right);
+                    break;
+                case NE:
+                    result = evaluate(node->data.binop.left) != evaluate(node->data.binop.right);
+                    break;
+                case LT:
+                    result = evaluate(node->data.binop.left) < evaluate(node->data.binop.right);
+                    break;
+                case GT:
+                    result = evaluate(node->data.binop.left) > evaluate(node->data.binop.right);
+                    break;
+                case LE:
+                    result = evaluate(node->data.binop.left) <= evaluate(node->data.binop.right);
+                    break;
+                case GE:
+                    result = evaluate(node->data.binop.left) >= evaluate(node->data.binop.right);
+                    break;
+                case PLUSEQ:
+                    result = evaluate(node->data.binop.left) + evaluate(node->data.binop.right);
+                    set(node->data.binop.left->data.var.name, result);
+                    break;
+                case MINUSEQ:
+                    result = evaluate(node->data.binop.left) - evaluate(node->data.binop.right);
+                    set(node->data.binop.left->data.var.name, result);
+                    break;
+                case MULTEQ:
+                    result = evaluate(node->data.binop.left) * evaluate(node->data.binop.right);
+                    set(node->data.binop.left->data.var.name, result);
+                    break;
+                case DIVEQ: 
+                    result = evaluate(node->data.binop.left) / evaluate(node->data.binop.right);
+                    set(node->data.binop.left->data.var.name, result);
+                    break;
+                default:
+                    printf("Error: Invalid binary operator\n");
+                    exit(1);
             }
             break;
         case IF:
