@@ -17,7 +17,11 @@ void go(){
         Lexer* l = New(string);
         printf("%s",string);
 
-        Ast* ast = parseStatement   (l);
+        Ast* ast = parseStatement(l);
+        if (ast == NULL) {
+            printf("Error: parseStatement returned NULL\n");
+            continue;
+        }
         printf("AST: ");
         printAst(ast);
 
