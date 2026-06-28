@@ -76,6 +76,32 @@ char peekChar(Lexer* l) {
     else return l->input[l->readPosition];
 }
 
+void createCompoundToken(Lexer* l, Token* tok, Tokentype type1, Tokentype type2, char ch) {
+    if(peekChar(l) == '=') {
+        char ch = l->ch;
+
+        readChar(l);
+        *tok = createDoubleCharToken(type1, ch, l->ch);
+    } else {
+        *tok = createToken(type2, l->ch);
+    }
+}
+
+Token createLiteralToken(Lexer* l, Token* tok) {
+    if (isLetter(l->ch)) {
+        tok->Lexeme = readId(l);
+        tok->Type = DetermineTokentype(tok->Lexeme);
+        return *tok;
+    } else if(isDigit(l->ch)) {
+        tok->Lexeme = readNumber(l);
+        tok->Type = TOKEN_DIGIT;
+        return *tok;
+    } else {
+        *tok = createToken(TOKEN_ILLEGAL, l->ch);
+    }
+    return *tok;
+}
+
 Token GetToken(Lexer* l){
     Token tok;
 
@@ -95,27 +121,10 @@ Token GetToken(Lexer* l){
             tok = createToken(TOKEN_RPAREN, l->ch);
             break;
         case '=':
-            if(peekChar(l) == '=') {
-                char ch = l->ch;
-
-                readChar(l);
-                tok = createDoubleCharToken(TOKEN_EQ, ch, l->ch);
-                break;
-            } else {
-                tok = createToken(TOKEN_ASSIGN, l->ch);
-                break;
-            }
+            createCompoundToken(l, &tok, TOKEN_EQ, TOKEN_ASSIGN, l->ch);
+            break;
         case '+':
-            if(peekChar(l) == '=') {
-                char ch = l->ch;
-
-                readChar(l);
-                tok = createDoubleCharToken(TOKEN_PLUSEQ, ch, l->ch);
-                break;
-            } else {
-                tok = createToken(TOKEN_PLUS, l->ch);
-                break;
-            }
+            createCompoundToken(l, &tok, TOKEN_PLUSEQ, TOKEN_PLUS, l->ch);
             break;
         case ';':
             tok = createToken(TOKEN_SEMICOLON, l->ch);
@@ -124,88 +133,29 @@ Token GetToken(Lexer* l){
             tok = createToken(TOKEN_COMMA, l->ch);
             break;
         case '-':
-            if(peekChar(l) == '=') {
-                char ch = l->ch;
-
-                readChar(l);
-                tok = createDoubleCharToken(TOKEN_MINUSEQ, ch, l->ch);
-                break;
-            } else {
-                tok = createToken(TOKEN_MINUS, l->ch);
-                break;
-            }
+            createCompoundToken(l, &tok, TOKEN_MINUSEQ, TOKEN_MINUS, l->ch);
+            break;
         case '*':
-            if(peekChar(l) == '=') {
-                char ch = l->ch;
-
-                readChar(l);
-                tok = createDoubleCharToken(TOKEN_MULTEQ, ch, l->ch);
-                break;
-            } else {
-                tok = createToken(TOKEN_MULT, l->ch);
-                break;
-            }
+            createCompoundToken(l, &tok, TOKEN_MULTEQ, TOKEN_MULT, l->ch);
+            break;
         case '/':
-            if(peekChar(l) == '=') {
-                char ch = l->ch;
-
-                readChar(l);
-                tok = createDoubleCharToken(TOKEN_DIVEQ, ch, l->ch);
-                break;
-            } else {
-                tok = createToken(TOKEN_DIV, l->ch);
-                break;
-            }
+            createCompoundToken(l, &tok, TOKEN_DIVEQ, TOKEN_DIV, l->ch);
+            break;
         case '<': 
-            if(peekChar(l) == '=') {
-                char ch = l->ch;
-
-                readChar(l);
-                tok = createDoubleCharToken(TOKEN_LE, ch, l->ch);
-                break;
-            } else {
-                tok = createToken(TOKEN_LT, l->ch);
-                break;
-            }
+            createCompoundToken(l, &tok, TOKEN_LE, TOKEN_LT, l->ch);
+            break;
         case '>': 
-            if(peekChar(l) == '=') {
-                char ch = l->ch;
-
-                readChar(l);
-                tok = createDoubleCharToken(TOKEN_GE, ch, l->ch);
-                break;
-            } else {
-                tok = createToken(TOKEN_GT, l->ch);
-                break;
-            }
+            createCompoundToken(l, &tok, TOKEN_GE, TOKEN_GT, l->ch);
+            break;
         case '!':
-            if(peekChar(l) == '=') {
-                char ch = l->ch;
-
-                readChar(l);
-                tok = createDoubleCharToken(TOKEN_NEQ, ch, l->ch);
-                break;
-            } else {
-                tok = createToken(TOKEN_EXCLAM, l->ch);
-                break;
-        }
+            createCompoundToken(l, &tok, TOKEN_NEQ, TOKEN_EXCLAM, l->ch);
+            break;
         case '\0':
             tok.Lexeme = "";
             tok.Type = TOKEN_EOF;
             break;
         default:
-            if (isLetter(l->ch)) {
-                tok.Lexeme = readId(l);
-                tok.Type = DetermineTokentype(tok.Lexeme);
-                return tok;
-            } else if(isDigit(l->ch)) {
-                tok.Lexeme = readNumber(l);
-                tok.Type = TOKEN_DIGIT;
-                return tok;
-            } else {
-                tok = createToken(TOKEN_ILLEGAL, l->ch);
-                break;
-            }
+            return createLiteralToken(l, &tok);
     }
     readChar(l);
     return tok;

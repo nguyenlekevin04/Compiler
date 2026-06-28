@@ -28,3 +28,16 @@ void go(){
         printf("\nResult: %d\n", result);
     }
 }
+
+void lexerTest(char* input) {
+    Lexer* l = New(input);
+    Token tok;
+
+    do {
+        tok = GetToken(l);
+        printf("Token: %s\n", tok.Lexeme);
+        FreeToken(&tok);
+    } while(tok.Type != TOKEN_EOF);
+
+    FreeLexer(l);
+}
