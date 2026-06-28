@@ -16,14 +16,9 @@ typedef struct Ast {
         struct {char* name;} var;
         struct {struct Ast* condition; struct Ast* thenBranch; struct Ast* elseBranch;} ifStmt;
     }data;
+    struct Ast* next;
 } Ast;
 
-/**
- * @brief Gets the next token from the lexer.
- * @param l Pointer to the lexer.
- * @return The next token.
- */
-Token getNextToken(Lexer* l);
 /**
  * @brief Parses a factor from the lexer.
  * @param l Pointer to the lexer.
@@ -48,6 +43,18 @@ Ast* parseTerm(Lexer* l);
  * @return A pointer to the parsed AST node.
  */
 Ast* parseExpression(Lexer* l);
+/**
+ * @brief Parses a block of statements from the lexer.
+ * @param l Pointer to the lexer.
+ * @return A pointer to the parsed AST node.
+ */
+Ast* parseBlock(Lexer* l);
+/**
+ * @brief Parses an if statement from the lexer.
+ * @param l Pointer to the lexer.
+ * @return A pointer to the parsed AST node.
+ */
+Ast* parseIf(Lexer* l);
 /**
  * @brief Prints the abstract syntax tree.
  * @param node Pointer to the AST node to print.

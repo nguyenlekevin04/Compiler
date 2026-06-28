@@ -89,10 +89,10 @@ Token GetToken(Lexer* l){
             tok = createToken(TOKEN_RBRACE, l->ch);
             break;
         case '(':
-            tok = createToken(TOKEN_RPAREN, l->ch);
+            tok = createToken(TOKEN_LPAREN, l->ch);
             break;
         case ')':
-            tok = createToken(TOKEN_LPAREN, l->ch);
+            tok = createToken(TOKEN_RPAREN, l->ch);
             break;
         case '=':
             if(peekChar(l) == '=') {

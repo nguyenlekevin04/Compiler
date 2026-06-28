@@ -5,12 +5,8 @@
 #include "../include/lexer.h"
 #include "../include/parser.h"
 
-Token getNextToken(Lexer* l) {
-    return GetToken(l);
-}
-
 Ast* parseFactor(Lexer* l) {
-    Token t1 = getNextToken(l);
+    Token t1 = GetToken(l);
 
     if (t1.Type == TOKEN_DIGIT) {
         Ast* node = (Ast*)malloc(sizeof(Ast));
@@ -47,6 +43,8 @@ Ast* parseStatement(Lexer* l) {
             printf("Error: Unexpected token after identifier: %s\n", t2.Lexeme);
             return NULL;
         }
+    } else if (t1.Type == TOKEN_IF) {
+        return parseIf(l);
     } else {
         Ast* node = parseExpression(l);
         return node;
@@ -105,6 +103,71 @@ Ast* parseExpression(Lexer* l) {
     }
 }
 
+Ast* parseBlock(Lexer* l) {
+    Token t1 = GetToken(l);
+
+    if (t1.Type != TOKEN_LBRACE) {
+        printf("Error: Expected '{' at the beginning of a block, but got %s\n", t1.Lexeme);
+        return NULL;
+    }
+    
+    Ast* head = parseStatement(l);
+    Ast* current = head;
+    while (peekToken(l).Type != TOKEN_RBRACE) {
+        Ast* next = parseStatement(l);
+        if (next == NULL) {
+            printf("Error: Failed to parse statement in block\n");
+            return NULL;
+        }
+        current->next = next;
+        current = next;
+    }
+    GetToken(l);
+    return head;
+}
+
+Ast* parseIf(Lexer* l) {
+    Token t1 = GetToken(l);
+
+    if (t1.Type != TOKEN_IF) {
+        printf("Error: Expected 'if' keyword, but got %s\n", t1.Lexeme);
+        return NULL;
+    }
+
+    Token t2 = GetToken(l);
+
+    if (t2.Type != TOKEN_LPAREN) {
+        printf("Error: Expected '(' after 'if', but got %s\n", t2.Lexeme);
+        return NULL;
+    }
+
+    Ast* condition = parseExpression(l);
+    Token t3 = GetToken(l); 
+
+    if (t3.Type != TOKEN_RPAREN) {
+        printf("Error: Expected ')' after condition, but got %s\n", t3.Lexeme);
+        return NULL;
+    }
+
+    Ast* thenBranch = parseBlock(l);
+
+    Ast* elseBranch = NULL;
+    Token t4 = peekToken(l);
+
+    if (t4.Type == TOKEN_ELSE) {
+        GetToken(l);
+        elseBranch = parseBlock(l);
+    }
+
+    Ast* ifNode = (Ast*)malloc(sizeof(Ast));
+    ifNode->AstType = IF;
+    ifNode->data.ifStmt.condition = condition;
+    ifNode->data.ifStmt.thenBranch = thenBranch;
+    ifNode->data.ifStmt.elseBranch = elseBranch;
+
+    return ifNode;
+}
+
 void printAst(Ast* node) {
     if (node == NULL) {
         return;
@@ -121,7 +184,6 @@ void printAst(Ast* node) {
             break;
         case BINOP:
             printAst(node->data.binop.left);
-
             switch (node->data.binop.op) {
                 case PLUS:
                     printf("+ ");
@@ -143,11 +205,24 @@ void printAst(Ast* node) {
         case ASSIGN:
             printf("%s = ", node->data.assign.name);
             break;
+        case IF:
+            printf("if (");
+            printAst(node->data.ifStmt.condition);
+            printf(") { ");
+            printAst(node->data.ifStmt.thenBranch);
+            printf("} ");
+
+            if (node->data.ifStmt.elseBranch != NULL) {
+                printf("else { ");
+                printAst(node->data.ifStmt.elseBranch);
+                printf("} ");
+            }
+            break;
         default:
             printf("Invalid AST node type\n");
     }
 
-    if (node->data.binop.right != NULL) {
-        printAst(node->data.binop.right);
+    if (node->next != NULL) {
+        printAst(node->next);
     }
 }
