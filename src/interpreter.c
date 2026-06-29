@@ -3,6 +3,7 @@
 
 #include "../include/interpreter.h"
 #include "../include/symboltable.h"
+#include "../include/functionTable.h"
 
 int evaluateBinop(Ast* node) {
     int result = 0;
@@ -39,19 +40,19 @@ int evaluateBinop(Ast* node) {
                 break;
             case PLUSEQ:
                 result = evaluate(node->data.binop.left) + evaluate(node->data.binop.right);
-                set(node->data.binop.left->data.var.name, result);
+                setSymbol(node->data.binop.left->data.var.name, result);
                 break;
             case MINUSEQ:
                 result = evaluate(node->data.binop.left) - evaluate(node->data.binop.right);
-                set(node->data.binop.left->data.var.name, result);
+                setSymbol(node->data.binop.left->data.var.name, result);
                 break;
             case MULTEQ:
                 result = evaluate(node->data.binop.left) * evaluate(node->data.binop.right);
-                set(node->data.binop.left->data.var.name, result);
+                setSymbol(node->data.binop.left->data.var.name, result);
                 break;
             case DIVEQ: 
                 result = evaluate(node->data.binop.left) / evaluate(node->data.binop.right);
-                set(node->data.binop.left->data.var.name, result);
+                setSymbol(node->data.binop.left->data.var.name, result);
                 break;
             default:
                 printf("Error: Invalid binary operator\n");
@@ -60,16 +61,53 @@ int evaluateBinop(Ast* node) {
         return result;
 }
 
+int evaluateDef(Ast* node) {
+    setFunction(node->data.def.name, node);
+    return 0;
+}
+
+int evaluateCallFunc(Ast* node) {
+    Ast* defNode = getFunction(node->data.callFunc.name);
+    if (defNode == NULL) {
+        printf("Error: Function '%s' not found\n", node->data.callFunc.name);
+        exit(1);
+    }
+
+    pushScope();
+
+    Ast* paramNode = defNode->data.def.head;
+    Ast* argNode = node->data.callFunc.head;
+
+    while (paramNode != NULL && argNode != NULL) {
+        int argValue = evaluate(argNode);
+        setSymbol(paramNode->data.var.name, argValue);
+
+        paramNode = paramNode->next;
+        argNode = argNode->next;
+    }
+
+    if (paramNode != NULL || argNode != NULL) {
+        printf("Error: Mismatch in number of parameters and arguments for function '%s'\n", node->data.callFunc.name);
+        exit(1);
+    }
+
+    int result = evaluate(defNode->data.def.body);
+    
+    popScope();
+
+    return result;
+}
+
 int evaluate(Ast* node) {
     int result = 0;
 
     switch (node->AstType) {
         case ASSIGN:
             result = evaluate(node->data.assign.left);
-            set(node->data.assign.name, result);
+            setSymbol(node->data.assign.name, result);
             break;
         case VAR:
-            result = get(node->data.var.name);
+            result = getSymbol(node->data.var.name);
             if (result == -1) {
                 printf("Error: Variable '%s' not found\n", node->data.var.name);
                 exit(1);
@@ -98,6 +136,12 @@ int evaluate(Ast* node) {
                 }
                 node->data.whileStmt.body = bodyNode;
             }
+            break;
+        case DEF:
+            result = evaluateDef(node);
+            break;
+        case CALLFUNC:
+            result = evaluateCallFunc(node);
             break;
         default:
             printf("Error: Invalid AST node type\n");

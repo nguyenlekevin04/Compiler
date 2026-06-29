@@ -8,7 +8,7 @@
  * @brief Represents an abstract syntax tree (AST) node.
  */
 typedef struct Ast {
-    enum {DIGIT, BINOP, ASSIGN, IF, WHILE, VAR, INVALID} AstType;
+    enum {DIGIT, BINOP, ASSIGN, IF, WHILE, VAR, DEF, CALLFUNC, INVALID} AstType;
     union {
         struct {int value;} digit;
         struct {struct Ast* left; struct Ast* right; enum {PLUS, MINUS, MULT, DIVIDE, EQ, NE, LT, GT, LE, GE, PLUSEQ, MINUSEQ, MULTEQ, DIVEQ} op;} binop;
@@ -16,10 +16,25 @@ typedef struct Ast {
         struct {char* name;} var;
         struct {struct Ast* condition; struct Ast* thenBranch; struct Ast* elseBranch;} ifStmt;
         struct {struct Ast* condition; struct Ast* body;} whileStmt;
+        struct {char* name; struct Ast* body; struct Ast* head;} def;
+        struct {char* name; struct Ast* head;} callFunc;
     }data;
     struct Ast* next;
 } Ast;
 
+/**
+ * @brief Parses the parameters of a function call from the lexer.
+ * @param l Pointer to the lexer.
+ * @return A pointer to the parsed AST node representing the parameters.
+ */
+Ast* parseCallParams(Lexer* l);
+/**
+ * @brief Parses a function call or identifier from the lexer.
+ * @param l Pointer to the lexer.
+ * @param t1 The token representing the function name or identifier.
+ * @return A pointer to the parsed AST node.
+ */
+Ast* parseFuncOrId(Lexer* l, Token t1);
 /**
  * @brief Parses a factor from the lexer.
  * @param l Pointer to the lexer.
@@ -62,6 +77,19 @@ Ast* parseIf(Lexer* l);
  * @return A pointer to the parsed AST node.
  */
 Ast* parseWhile(Lexer* l);
+/**
+ * @brief Parses a function definition from the lexer.
+ * @param l Pointer to the lexer.
+ * @param t1 The token representing the 'def' keyword.
+ * @return A pointer to the parsed AST node.
+ */
+Ast* parseParams(Lexer* l);
+/**
+ * @brief Parses a function definition from the lexer.
+ * @param l Pointer to the lexer.
+ * @return A pointer to the parsed AST node.
+ */
+Ast* parseDef(Lexer* l);
 /**
  * @brief Parses an assignment statement from the lexer.
  * @param l Pointer to the lexer.

@@ -5,6 +5,55 @@
 #include "../include/lexer.h"
 #include "../include/parser.h"
 
+Ast* parseCallParams(Lexer* l) {
+    Ast* head = NULL;
+    Ast* current = NULL;
+
+    while (peekToken(l).Type != TOKEN_RPAREN) {
+        Ast* paramNode = parseExpression(l);
+        paramNode->next = NULL;
+
+        if (head == NULL) {
+            head = paramNode;
+            current = paramNode;
+        } else {
+            current->next = paramNode;
+            current = paramNode;
+        }
+
+        Token t3 = peekToken(l);
+        if (t3.Type == TOKEN_COMMA) {
+            GetToken(l); 
+        } else if (t3.Type != TOKEN_RPAREN) {
+            printf("Error: Expected ',' or ')' in parameters, but got %s\n", t3.Lexeme);
+            return NULL;
+        }
+    }
+
+    GetToken(l);
+    return head;
+}
+
+Ast* parseFuncOrId(Lexer* l, Token t1) {
+    if (peekToken(l).Type == TOKEN_LPAREN) {
+        GetToken(l);
+
+        Ast* params = parseCallParams(l);
+
+        Ast* callFuncNode = (Ast*)malloc(sizeof(Ast));
+        callFuncNode->AstType = CALLFUNC;
+        callFuncNode->data.callFunc.name = t1.Lexeme;
+        callFuncNode->data.callFunc.head = params;
+        return callFuncNode;
+    } else {
+        Ast* node = (Ast*)malloc(sizeof(Ast));
+        node->AstType = VAR;
+        node->data.var.name = t1.Lexeme;
+        return node;
+    }
+    return NULL;
+}
+
 Ast* parseFactor(Lexer* l) {
     Token t1 = GetToken(l);
 
@@ -14,10 +63,7 @@ Ast* parseFactor(Lexer* l) {
         node->data.digit.value = atoi(t1.Lexeme);
         return node;
     } else if (t1.Type == TOKEN_ID) {
-        Ast* node = (Ast*)malloc(sizeof(Ast));
-        node->AstType = VAR;
-        node->data.var.name = t1.Lexeme;
-        return node;
+        return parseFuncOrId(l, t1);
     } else {
         printf("Error: Expected a digit or identifier, but got %s\n", t1.Lexeme);
         return NULL;
@@ -163,7 +209,7 @@ Ast* parseIf(Lexer* l) {
 }
 
 Ast* parseWhile(Lexer* l) {
-        Token t1 = GetToken(l);
+    Token t1 = GetToken(l);
     if (t1.Type != TOKEN_WHILE) {
         printf("Error: Expected 'while' keyword, but got %s\n", t1.Lexeme);
         return NULL;
@@ -190,6 +236,73 @@ Ast* parseWhile(Lexer* l) {
     whileNode->data.whileStmt.body = thenBranch;
 
     return whileNode;
+}
+
+Ast* parseParams(Lexer* l) {
+    Token t1 = GetToken(l);
+    if (t1.Type != TOKEN_LPAREN) {
+        printf("Error: Expected '(' at the beginning of parameters, but got %s\n", t1.Lexeme);
+        return NULL;
+    }
+
+    Ast* head = NULL;
+    Ast* current = NULL;
+
+    while (peekToken(l).Type != TOKEN_RPAREN) {
+        Token t2 = GetToken(l);
+        if (t2.Type != TOKEN_ID) {
+            printf("Error: Expected identifier in parameters, but got %s\n", t2.Lexeme);
+            return NULL;
+        }
+
+        Ast* paramNode = (Ast*)malloc(sizeof(Ast));
+        paramNode->AstType = VAR;
+        paramNode->data.var.name = t2.Lexeme;
+        paramNode->next = NULL;
+
+        if (head == NULL) {
+            head = paramNode;
+            current = paramNode;
+        } else {
+            current->next = paramNode;
+            current = paramNode;
+        }
+
+        Token t3 = peekToken(l);
+        if (t3.Type == TOKEN_COMMA) {
+            GetToken(l); 
+        } else if (t3.Type != TOKEN_RPAREN) {
+            printf("Error: Expected ',' or ')' in parameters, but got %s\n", t3.Lexeme);
+            return NULL;
+        }
+    }
+
+    GetToken(l);
+    return head;
+}
+
+Ast* parseDef(Lexer* l) {
+    Token t1 = GetToken(l);
+    if(t1.Type != TOKEN_FUNC) {
+        printf("Error: Expected 'def' keyword, but got %s\n", t1.Lexeme);
+        return NULL;
+    }
+
+    Token t2 = GetToken(l);
+    if(t2.Type != TOKEN_ID) {
+        printf("Error: Expected function name after 'def', but got %s\n", t2.Lexeme);
+        return NULL;
+    }
+
+    Ast* params = parseParams(l);
+    Ast* body = parseBlock(l);
+
+    Ast* defNode = (Ast*)malloc(sizeof(Ast));
+    defNode->AstType = DEF;
+    defNode->data.def.name = t2.Lexeme;
+    defNode->data.def.body = body;
+    defNode->data.def.head = params;
+    return defNode;
 }
 
 Ast* parseAssign(Lexer* l, Token t1) {
@@ -224,7 +337,10 @@ Ast* parseAssign(Lexer* l, Token t1) {
         node->data.binop.left->data.var.name = t1.Lexeme;
         node->data.binop.right = parseComparison(l);
         return node;
-    }else {
+    } else if (t2.Type == TOKEN_LPAREN) {
+        GetToken(l);
+        return parseFuncOrId(l, t1);
+    } else {
         printf("Error: Unexpected token after identifier: %s\n", t2.Lexeme);
         return NULL;
     }
@@ -238,6 +354,8 @@ Ast* parseStatement(Lexer* l) {
         return parseIf(l);
     } else if (t1.Type == TOKEN_WHILE) {
         return parseWhile(l);
+    } else if (t1.Type == TOKEN_FUNC) {
+        return parseDef(l);
     } else {
         Ast* node = parseComparison(l);
         return node;
@@ -333,6 +451,32 @@ void printAst(Ast* node) {
             printf(") { ");
             printAst(node->data.whileStmt.body);
             printf("} ");
+            break;
+        case DEF:
+            printf("def %s(", node->data.def.name);
+            Ast* paramNode = node->data.def.head;
+            while (paramNode != NULL) {
+                printf("%s", paramNode->data.var.name);
+                paramNode = paramNode->next;
+                if (paramNode != NULL) {
+                    printf(", ");
+                }
+            }
+            printf(") { ");
+            printAst(node->data.def.body);
+            printf("} ");
+            break;
+        case CALLFUNC:
+            printf("%s(", node->data.callFunc.name);
+            Ast* argNode = node->data.callFunc.head;
+            while (argNode != NULL) {
+                printAst(argNode);
+                argNode = argNode->next;
+                if (argNode != NULL) {
+                    printf(", ");
+                }
+            }
+            printf(") ");
             break;
         default:
             printf("Invalid AST node type\n");

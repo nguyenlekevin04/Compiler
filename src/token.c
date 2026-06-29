@@ -4,7 +4,7 @@
 #include "../include/token.h"
 
     const char* tokens[COUNT] = {
-        [TOKEN_FUNC]      = "func",
+        [TOKEN_FUNC]      = "def",
         [TOKEN_LET]       = "let",
         [TOKEN_IF]        = "if",
         [TOKEN_ELSE]      = "else",

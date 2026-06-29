@@ -19,12 +19,19 @@ extern SymbolTable* table;
  * @param name The name of the variable.
  * @param value The value of the variable.
  */
-void set(char* name, int value);
+void setSymbol(char* name, int value);
 /**
  * @brief Gets the value of a variable from the symbol table.
  * @param name The name of the variable.
  * @return The value of the variable, or -1 if not found.
  */
-int get(char* name);
-
+int getSymbol(char* name);
+/**
+ * @brief Pushes a new scope onto the symbol table.
+ */
+void pushScope();
+/**
+ * @brief Pops the current scope from the symbol table.
+ */
+void popScope();
 #endif
