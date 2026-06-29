@@ -1,8 +1,8 @@
 # Compiler
 
-Ein einfacher, eigener Compiler/Interpreter in **C** mit modularem Aufbau (Lexer, Parser, Interpreter, Symboltabelle, Funktionsverwaltung).
+A simple custom compiler/interpreter written in **C**, with a modular structure (lexer, parser, interpreter, symbol table, and function table).
 
-## 📁 Projektstruktur
+## 📁 Project Structure
 
 ```text
 .
@@ -29,51 +29,51 @@ Ein einfacher, eigener Compiler/Interpreter in **C** mit modularem Aufbau (Lexer
 
 ## ⚙️ Build
 
-### Voraussetzungen
+### Requirements
 - `gcc`
 - `make`
 
-### Kompilieren
+### Compile
 
 ```bash
 make
 ```
 
-Dadurch wird die ausführbare Datei **`compiler`** erzeugt.
+This creates the executable file **`compiler`**.
 
-## ▶️ Ausführen
+## ▶️ Run
 
 ```bash
 ./compiler
 ```
 
-> Falls dein Programm Eingabedateien oder Argumente erwartet, ergänze hier ein konkretes Beispiel.
+> If your program expects input files or command-line arguments, add a concrete example here.
 
-## 🧩 Komponenten
+## 🧩 Components
 
 - **lexer.c / lexer.h**  
-  Zerlegt den Quelltext in Tokens.
+  Converts source code into tokens.
 
 - **parser.c / parser.h**  
-  Analysiert die Token-Sequenz syntaktisch.
+  Performs syntax analysis on the token stream.
 
 - **token.c / token.h**  
-  Definition und Handling von Token-Typen.
+  Defines token types and token handling.
 
 - **interpreter.c / interpreter.h**  
-  Führt geparste Strukturen/Anweisungen aus.
+  Executes parsed structures/statements.
 
 - **symboltable.c / symboltable.h**  
-  Verwaltung von Variablen/Symbolen.
+  Manages variables/symbols.
 
 - **functionTable.c / functionTable.h**  
-  Verwaltung von Funktionen.
+  Manages function definitions and lookup.
 
 - **console.c / console.h**  
-  Konsolen-Ausgabe/Utility-Funktionen.
+  Console output and utility helpers.
 
 - **main.c**  
-  Programmeinstieg und Orchestrierung der Pipeline.
+  Entry point and pipeline orchestration.
 
 ## 🧹 Clean
 
@@ -81,16 +81,16 @@ Dadurch wird die ausführbare Datei **`compiler`** erzeugt.
 make clean
 ```
 
-Entfernt die erzeugte Binärdatei `compiler`.
+Removes the generated `compiler` binary.
 
-## 🚀 Nächste sinnvolle Verbesserungen
+## 🚀 Suggested Next Improvements
 
-- Compiler-Warnflags ergänzen (`-Wall -Wextra -Wpedantic`)
-- Debug-Build-Target hinzufügen (`-g`)
-- Test-Ordner + automatische Tests (`make test`)
-- Kurze Beispieldateien + Usage-Section mit konkreten Inputs/Outputs
-- Lizenzdatei hinzufügen (z. B. MIT)
+- Add compiler warning flags (`-Wall -Wextra -Wpedantic`)
+- Add a debug build target (`-g`)
+- Add a test directory + automated tests (`make test`)
+- Add example source files + concrete usage examples
+- Add a license (e.g. MIT)
 
-## 📄 Lizenz
+## 📄 License
 
-Aktuell ist keine Lizenz hinterlegt.
+No license has been added yet.
